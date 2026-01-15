@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { useGetMyServices, useCreateNewService, useStartServiceQueue } from '../hooks/useQueries';
+import { useGetMyServices, useCreateNewService, useStartServiceQueue, useDeleteServiceLocation } from '../hooks/useQueries';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus, Store, Users, Clock, Play } from 'lucide-react';
+import { Plus, Store, Users, Clock, Play, X } from 'lucide-react';
 import { toast } from 'sonner';
 import ServiceQueueManager from '../components/ServiceQueueManager';
 import { Variant_closed_open } from '../backend';
@@ -16,6 +17,7 @@ export default function BusinessDashboard() {
   const { data: services, isLoading } = useGetMyServices();
   const createService = useCreateNewService();
   const startQueue = useStartServiceQueue();
+  const deleteService = useDeleteServiceLocation();
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [newServiceName, setNewServiceName] = useState('');
@@ -58,6 +60,20 @@ export default function BusinessDashboard() {
     } catch (error) {
       toast.error('Gagal memulai antrian');
       console.error('Start queue error:', error);
+    }
+  };
+
+  const handleDeleteService = async (serviceId: string, serviceName: string) => {
+    try {
+      await deleteService.mutateAsync(serviceId);
+      toast.success(`Layanan "${serviceName}" berhasil dihapus`);
+    } catch (error: any) {
+      if (error.message?.includes('Can only delete services that are closed')) {
+        toast.error('Hanya dapat menghapus layanan yang sudah ditutup');
+      } else {
+        toast.error('Gagal menghapus layanan');
+      }
+      console.error('Delete service error:', error);
     }
   };
 
@@ -186,22 +202,64 @@ export default function BusinessDashboard() {
                 </div>
 
                 {service.status === Variant_closed_open.closed ? (
-                  <Button
-                    onClick={() => handleStartQueue(service.serviceID)}
-                    disabled={startQueue.isPending}
-                    className="w-full gap-2"
-                  >
-                    <Play className="h-4 w-4" />
-                    Mulai Antrian
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => handleStartQueue(service.serviceID)}
+                      disabled={startQueue.isPending}
+                      className="flex-1 gap-2"
+                    >
+                      <Play className="h-4 w-4" />
+                      Mulai Antrian
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          disabled={deleteService.isPending}
+                          title="Hapus layanan"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Apakah Anda yakin ingin menghapus layanan ini?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Tindakan ini tidak dapat dibatalkan. Layanan "{service.name}" akan dihapus secara permanen dari sistem.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Batal</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDeleteService(service.serviceID, service.name)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            {deleteService.isPending ? 'Menghapus...' : 'Hapus'}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 ) : (
-                  <Button
-                    onClick={() => setSelectedServiceId(service.serviceID)}
-                    variant="outline"
-                    className="w-full"
-                  >
-                    Kelola Antrian
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => setSelectedServiceId(service.serviceID)}
+                      variant="outline"
+                      className="flex-1"
+                    >
+                      Kelola Antrian
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      disabled
+                      title="Hanya dapat menghapus layanan yang sudah ditutup"
+                      className="opacity-50 cursor-not-allowed"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
                 )}
               </CardContent>
             </Card>
