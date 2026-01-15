@@ -155,6 +155,7 @@ export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole__1): Promise<void>;
     clearCustomerServiceQueueMapping(customerId: CustomerID): Promise<void>;
     createNewService(name: string, capacity: bigint): Promise<ServiceID>;
+    deleteServiceLocation(serviceId: ServiceID): Promise<void>;
     getAllActiveQueues(): Promise<Array<Queue>>;
     getAllServices(): Promise<Array<ServiceLocation>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
@@ -267,6 +268,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.createNewService(arg0, arg1);
+            return result;
+        }
+    }
+    async deleteServiceLocation(arg0: ServiceID): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteServiceLocation(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteServiceLocation(arg0);
             return result;
         }
     }

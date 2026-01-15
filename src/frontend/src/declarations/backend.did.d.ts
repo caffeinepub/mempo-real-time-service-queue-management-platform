@@ -60,6 +60,7 @@ export interface _SERVICE {
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole__1], undefined>,
   'clearCustomerServiceQueueMapping' : ActorMethod<[CustomerID], undefined>,
   'createNewService' : ActorMethod<[string, bigint], ServiceID>,
+  'deleteServiceLocation' : ActorMethod<[ServiceID], undefined>,
   'getAllActiveQueues' : ActorMethod<[], Array<Queue>>,
   'getAllServices' : ActorMethod<[], Array<ServiceLocation>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,

@@ -7,7 +7,7 @@
     "authorization": "4.0.0",
     "blob-storage": "4.0.0"
   },
-  "aiCoreVersion": "0.13.5",
+  "aiCoreVersion": "0.14.0",
   "motokoVersion": "1.0.0-beta",
   "coreLibVersion": "implicits-20"
 }

@@ -51,6 +51,10 @@ MEMPO is a two-sided web platform that enables businesses to manage real-time se
 - Manage the currently served queue number with "Next" button that automatically increments the serving number by 1
 - View the current serving number fetched from the backend in a read-only display
 - View and control queue serving progression in real-time
+- Delete services through a red "X" delete button in the Manage Queue section
+- Delete button is only enabled when the service status is "Tutup" (closed)
+- Confirmation dialog appears before deletion with message "Apakah Anda yakin ingin menghapus layanan ini?"
+- Service list automatically refreshes after successful deletion
 
 ### Customers
 - Register and authenticate using Internet Identity with email and role selection
@@ -110,6 +114,10 @@ MEMPO is a two-sided web platform that enables businesses to manage real-time se
 - Estimated service time input with validation and save functionality
 - Currently served number management with read-only display showing the current serving number fetched from the backend
 - "Next" button that increments the current serving number by 1 and updates it on the backend via updateCurrentServingNumber
+- Red "X" delete button next to each service in the Manage Queue section
+- Delete button is only enabled when service status is "Tutup" (closed)
+- Confirmation dialog with message "Apakah Anda yakin ingin menghapus layanan ini?" before deletion
+- Automatic service list refresh after successful deletion
 - Status summary displaying:
   - Location open/closed status
   - Current queue length
@@ -167,6 +175,16 @@ MEMPO is a two-sided web platform that enables businesses to manage real-time se
 - Real-time synchronization of queue status, serving number changes, and service hours updates across all connected users
 - Optimized React Query polling to prevent overlapping or infinite fetch loops
 - Efficient data fetching patterns that maintain responsiveness without performance degradation
+
+### Service Deletion System
+- Service deletion functionality available only to business owners
+- Red "X" delete button displayed next to each service in the Manage Queue section
+- Delete button is conditionally enabled only when service status is "Tutup" (closed)
+- Confirmation dialog displays before deletion with Indonesian message "Apakah Anda yakin ingin menghapus layanan ini?"
+- Backend service deletion removes service from registry and all associated data
+- Automatic refresh of service list after successful deletion
+- UI updates immediately to reflect service removal
+- Proper error handling and user feedback during deletion process
 
 ## UI and Branding
 
@@ -228,6 +246,7 @@ MEMPO is a two-sided web platform that enables businesses to manage real-time se
 - Immediate UI updates when users change roles without requiring page refresh
 - Real-time serving number updates when business owners use the "Next" button to increment the currently served number
 - Real-time updates of customer's own queue number as queues progress or when they leave
+- Real-time service list updates when services are deleted by business owners
 - Optimized polling intervals and request management to prevent performance issues
 - Efficient React Query configuration to avoid overlapping fetch requests and infinite loops
 
@@ -265,6 +284,9 @@ MEMPO is a two-sided web platform that enables businesses to manage real-time se
 - Backend queue-to-service mapping storage and retrieval for accurate queue operations
 - Backend endpoints for queue start/stop control with proper validation
 - Backend endpoints for currently served number getter and setter operations
+- Backend service deletion endpoint that removes service and associated data from registry
+- Frontend service deletion confirmation dialog with Indonesian text
+- Frontend delete button conditional enabling based on service status
 - Frontend queue control UI with "Next" button for incrementing serving number and read-only display for current serving number
 - Frontend "Estimated Time" button and input modal/field for setting average service time per customer
 - Frontend "Waktu Pelayanan" section with time picker inputs for weekday and weekend hours configuration
@@ -290,6 +312,7 @@ MEMPO is a two-sided web platform that enables businesses to manage real-time se
 - ServiceQueueManager component must be optimized to prevent unnecessary re-renders during queue updates
 - CustomerView component must handle real-time updates efficiently without causing UI freezing
 - Queue control buttons ("Start Queue", "Stop Queue", "Next Number", "Estimated Time", "Waktu Pelayanan") must remain responsive during all operations
+- Service deletion operations must be optimized to prevent UI blocking during deletion process
 - Visual loading states must be implemented for all queue update operations to provide user feedback
 - Data fetching patterns must be optimized to maintain application responsiveness
 - React component memoization and optimization techniques must be applied where appropriate
@@ -306,6 +329,7 @@ MEMPO is a two-sided web platform that enables businesses to manage real-time se
 - Customer view must immediately re-fetch queue status data when queues start or stop to ensure real-time consistency
 - Service status (open/closed) displayed to customers must accurately reflect backend service state updated by `updateServiceStatus`
 - Service hours changes (weekday and weekend) must immediately sync across all connected users through existing live update polling
+- Service deletion must immediately sync across all connected users with automatic service list refresh
 - Polling logic in React Query hooks must trigger immediate updates for both `getServiceQueueStatus` and `getAllActiveQueues` endpoints
 - Frontend customer interface must refresh queue data automatically when queue state changes occur
 - Backend queue state changes must be immediately reflected in customer-facing queue status displays

@@ -1,4 +1,4 @@
-import { useGetMyServices, useGetActiveQueueId, useStopServiceQueue, useResumeServiceQueue, usePauseServiceQueue, useGetCompleteQueueInfo, useUpdateCurrentServingNumber, useSetEstimatedTimePerCustomer, useGetEstimatedTimePerCustomer, useGetServiceHours, useSetWeekdayServiceHours, useSetWeekendServiceHours } from '../hooks/useQueries';
+import { useGetMyServices, useGetActiveQueueId, useStopServiceQueue, useResumeServiceQueue, usePauseServiceQueue, useGetCompleteQueueInfo, useUpdateCurrentServingNumber, useSetEstimatedTimePerCustomer, useGetEstimatedTimePerCustomer, useGetServiceHours, useSetWeekdayServiceHours, useSetWeekendServiceHours, useDeleteServiceLocation } from '../hooks/useQueries';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,9 +7,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { ArrowLeft, Square, Play, Users, Clock, RefreshCw, Hash, ChevronRight, Pause, Timer, CalendarClock } from 'lucide-react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { ArrowLeft, Square, Play, Users, Clock, RefreshCw, Hash, ChevronRight, Pause, Timer, CalendarClock, X } from 'lucide-react';
 import { toast } from 'sonner';
-import { Variant_active_stopped_paused } from '../backend';
+import { Variant_active_stopped_paused, Variant_closed_open } from '../backend';
 import { useEffect, useRef, useState } from 'react';
 
 interface ServiceQueueManagerProps {
@@ -30,6 +31,7 @@ export default function ServiceQueueManager({ serviceId, onBack }: ServiceQueueM
   const setEstimatedTime = useSetEstimatedTimePerCustomer();
   const setWeekdayHours = useSetWeekdayServiceHours();
   const setWeekendHours = useSetWeekendServiceHours();
+  const deleteService = useDeleteServiceLocation();
 
   const service = services?.find((s) => s.serviceID === serviceId);
   const lastFetchTimeRef = useRef<number>(Date.now());
@@ -198,6 +200,21 @@ export default function ServiceQueueManager({ serviceId, onBack }: ServiceQueueM
     }
   };
 
+  const handleDeleteService = async () => {
+    try {
+      await deleteService.mutateAsync(serviceId);
+      toast.success('Layanan berhasil dihapus');
+      onBack();
+    } catch (error: any) {
+      if (error.message?.includes('Can only delete services that are closed')) {
+        toast.error('Hanya dapat menghapus layanan yang sudah ditutup');
+      } else {
+        toast.error('Gagal menghapus layanan');
+      }
+      console.error('Delete service error:', error);
+    }
+  };
+
   if (!service) {
     return (
       <div className="container py-8">
@@ -209,6 +226,7 @@ export default function ServiceQueueManager({ serviceId, onBack }: ServiceQueueM
   const isActive = queueInfo?.status === Variant_active_stopped_paused.active;
   const isPaused = queueInfo?.status === Variant_active_stopped_paused.paused;
   const isStopped = queueInfo?.status === Variant_active_stopped_paused.stopped;
+  const isClosed = service.status === Variant_closed_open.closed;
 
   const weekdayHours = serviceHours?.weekdayServiceHours;
   const weekendHours = serviceHours?.weekendServiceHours;
@@ -232,6 +250,35 @@ export default function ServiceQueueManager({ serviceId, onBack }: ServiceQueueM
                 <span>Memperbarui...</span>
               </div>
             )}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="destructive"
+                  size="icon"
+                  disabled={!isClosed || deleteService.isPending}
+                  title={isClosed ? 'Hapus layanan' : 'Hanya dapat menghapus layanan yang sudah ditutup'}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Apakah Anda yakin ingin menghapus layanan ini?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Tindakan ini tidak dapat dibatalkan. Layanan "{service.name}" akan dihapus secara permanen dari sistem.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Batal</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDeleteService}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    {deleteService.isPending ? 'Menghapus...' : 'Hapus'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
             <Badge 
               variant={isActive ? 'default' : 'secondary'} 
               className="text-base px-4 py-2"
@@ -644,4 +691,3 @@ export default function ServiceQueueManager({ serviceId, onBack }: ServiceQueueM
     </div>
   );
 }
-

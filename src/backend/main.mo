@@ -964,4 +964,41 @@ actor {
       case (?service) { { weekdayServiceHours = service.weekdayServiceHours; weekendServiceHours = service.weekendServiceHours } };
     };
   };
+
+  // New Delete Service Function
+  public shared ({ caller }) func deleteServiceLocation(serviceId : ServiceID) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only registered users can delete services");
+    };
+
+    if (not isBusinessOwner(caller)) {
+      Runtime.trap("Unauthorized: Only business owners can delete services");
+    };
+
+    switch (services.get(serviceId)) {
+      case (null) {
+        Runtime.trap("Service not found");
+      };
+      case (?service) {
+        if (not isServiceOwner(caller, serviceId)) {
+          Runtime.trap("Unauthorized: Only the service owner can delete this service");
+        };
+
+        if (service.status != #closed) {
+          Runtime.trap("Unauthorized: Can only delete services that are closed");
+        };
+
+        services.remove(serviceId);
+        serviceOwnerMap.remove(serviceId);
+
+        // Remove service location from owner's tracking
+        let existingServices = switch (ownerServices.get(caller)) {
+          case (null) { [] };
+          case (?services) { services };
+        };
+        let updatedServices = existingServices.filter(func(s) { s != serviceId });
+        ownerServices.add(caller, updatedServices);
+      };
+    };
+  };
 };

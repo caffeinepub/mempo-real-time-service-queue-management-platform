@@ -98,6 +98,22 @@ export function useCreateNewService() {
   });
 }
 
+export function useDeleteServiceLocation() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (serviceId: ServiceID) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.deleteServiceLocation(serviceId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['myServices'] });
+      queryClient.invalidateQueries({ queryKey: ['allServices'] });
+    },
+  });
+}
+
 export function useStartServiceQueue() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
@@ -505,4 +521,3 @@ export function useSetWeekendServiceHours() {
     },
   });
 }
-

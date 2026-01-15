@@ -72,6 +72,7 @@ export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole__1): Promise<void>;
     clearCustomerServiceQueueMapping(customerId: CustomerID): Promise<void>;
     createNewService(name: string, capacity: bigint): Promise<ServiceID>;
+    deleteServiceLocation(serviceId: ServiceID): Promise<void>;
     getAllActiveQueues(): Promise<Array<Queue>>;
     getAllServices(): Promise<Array<ServiceLocation>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
