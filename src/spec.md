@@ -51,8 +51,8 @@ MEMPO is a two-sided web platform that enables businesses to manage real-time se
 - Manage the currently served queue number with "Next" button that automatically increments the serving number by 1
 - View the current serving number fetched from the backend in a read-only display
 - View and control queue serving progression in real-time
-- Delete services through a red "X" delete button in the Manage Queue section
-- Delete button is only enabled when the service status is "Tutup" (closed)
+- Delete services through a prominently visible red "X" delete button in the Manage Queue section
+- Delete button is clearly visible for each service entry and only enabled when the service status is "Tutup" (closed)
 - Confirmation dialog appears before deletion with message "Apakah Anda yakin ingin menghapus layanan ini?"
 - Service list automatically refreshes after successful deletion
 
@@ -114,10 +114,10 @@ MEMPO is a two-sided web platform that enables businesses to manage real-time se
 - Estimated service time input with validation and save functionality
 - Currently served number management with read-only display showing the current serving number fetched from the backend
 - "Next" button that increments the current serving number by 1 and updates it on the backend via updateCurrentServingNumber
-- Red "X" delete button next to each service in the Manage Queue section
-- Delete button is only enabled when service status is "Tutup" (closed)
+- Prominently visible red "X" delete button for each service in the Manage Queue section
+- Delete button is clearly visible and only enabled when service status is "Tutup" (closed)
 - Confirmation dialog with message "Apakah Anda yakin ingin menghapus layanan ini?" before deletion
-- Automatic service list refresh after successful deletion
+- Automatic service list refresh after successful deletion using deleteServiceLocation(serviceId) backend method
 - Status summary displaying:
   - Location open/closed status
   - Current queue length
@@ -178,10 +178,10 @@ MEMPO is a two-sided web platform that enables businesses to manage real-time se
 
 ### Service Deletion System
 - Service deletion functionality available only to business owners
-- Red "X" delete button displayed next to each service in the Manage Queue section
-- Delete button is conditionally enabled only when service status is "Tutup" (closed)
+- Prominently visible red "X" delete button displayed for each service in the Manage Queue section
+- Delete button is clearly visible and conditionally enabled only when service status is "Tutup" (closed)
 - Confirmation dialog displays before deletion with Indonesian message "Apakah Anda yakin ingin menghapus layanan ini?"
-- Backend service deletion removes service from registry and all associated data
+- Backend service deletion removes service from registry and all associated data using deleteServiceLocation(serviceId) method
 - Automatic refresh of service list after successful deletion
 - UI updates immediately to reflect service removal
 - Proper error handling and user feedback during deletion process
@@ -286,7 +286,7 @@ MEMPO is a two-sided web platform that enables businesses to manage real-time se
 - Backend endpoints for currently served number getter and setter operations
 - Backend service deletion endpoint that removes service and associated data from registry
 - Frontend service deletion confirmation dialog with Indonesian text
-- Frontend delete button conditional enabling based on service status
+- Frontend delete button conditional enabling based on service status with clear visibility
 - Frontend queue control UI with "Next" button for incrementing serving number and read-only display for current serving number
 - Frontend "Estimated Time" button and input modal/field for setting average service time per customer
 - Frontend "Waktu Pelayanan" section with time picker inputs for weekday and weekend hours configuration

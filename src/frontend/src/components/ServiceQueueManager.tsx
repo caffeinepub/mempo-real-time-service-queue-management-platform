@@ -254,11 +254,13 @@ export default function ServiceQueueManager({ serviceId, onBack }: ServiceQueueM
               <AlertDialogTrigger asChild>
                 <Button
                   variant="destructive"
-                  size="icon"
+                  size="default"
                   disabled={!isClosed || deleteService.isPending}
                   title={isClosed ? 'Hapus layanan' : 'Hanya dapat menghapus layanan yang sudah ditutup'}
+                  className="gap-2"
                 >
                   <X className="h-4 w-4" />
+                  Hapus Layanan
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
